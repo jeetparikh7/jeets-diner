@@ -1,0 +1,25 @@
+/* --------------------
+   Case Study Questions
+   --------------------*/
+
+-- 1. What is the total amount each customer spent at the restaurant?
+SELECT s.customer_id, sum(price) as total_amount_spent
+FROM sales as s
+JOIN menu as mn
+ON s.product_id = mn.product_id
+GROUP BY s.customer_id;
+
+-- 2. How many days has each customer visited the restaurant?
+SELECT customer_id, COUNT(DISTINCT(order_date)) as days_visited
+FROM sales
+GROUP BY customer_id;
+
+-- 3. What was the first item from the menu purchased by each customer?
+( SELECT s.customer_id, mn.product_id, mn.product_name, DENSE_RANK() OVER (PARTITION BY s.customer_id, ORDER BY s.order_date) as rank
+FROM sales as s
+JOIN menu as mn
+ON s.product_id = mn.product_id)
+SELECT customer_id, product_name
+FROM ordered_sales_cte
+WHERE rank = 1;
+
